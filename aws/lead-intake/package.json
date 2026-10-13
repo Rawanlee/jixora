@@ -1,0 +1,14 @@
+{
+  "name": "jixora-lead-intake",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AWS Lambda + Amazon SES backend for the JiXora website forms.",
+  "main": "src/handler.mjs",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sesv2": "^3.700.0"
+  }
+}

@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: JiXora website form intake (AWS Lambda + Amazon SES)
+
+Parameters:
+  FromEmail:
+    Type: String
+    Description: SES-verified sender address, e.g. no-reply@jixora.space
+  ToEmail:
+    Type: String
+    Default: rasheed@jixora.space
+    Description: Inbox that receives form submissions
+  AllowedOrigins:
+    Type: String
+    Default: https://www.jixora.space,https://jixora.space
+    Description: Comma-separated list of website origins allowed to submit
+
+Resources:
+  LeadIntakeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handler.handler
+      Runtime: nodejs20.x
+      Architectures: [arm64]
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          FROM_EMAIL: !Ref FromEmail
+          TO_EMAIL: !Ref ToEmail
+          ALLOWED_ORIGINS: !Ref AllowedOrigins
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: '*'
+      FunctionUrlConfig:
+        AuthType: NONE
+
+  LeadIntakeLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${LeadIntakeFunction}
+      RetentionInDays: 30
+
+Outputs:
+  FormsEndpoint:
+    Description: Set this as VITE_FORMS_ENDPOINT in the website build
+    Value: !GetAtt LeadIntakeFunctionUrl.FunctionUrl
