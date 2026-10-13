@@ -1,0 +1,19 @@
+# AWS Amplify Hosting build settings (optional hosting target).
+# In the Amplify console add one rewrite rule so unknown paths show the 404 page:
+#   source: </^[^.]+$|\.(?!(css|js|png|svg|xml|txt|woff2?|ico|json)$)([^.]+$)/>  target: /404.html  type: 404
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
